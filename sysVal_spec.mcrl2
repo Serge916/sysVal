@@ -1,0 +1,15 @@
+sort doorStatus = struct open | closed;
+	lightStatus = struct on | off;
+	lightColor = struct green | red | yellow;
+	lockArmStatus = struct fixed | loose;
+	lockArmPosition = struct horizontal | vertical | inBetween;
+	lightArray =	lightColor -> lightStatus;	%Tracks the light status based on its color?
+
+act lockArm, unlockArm, pressEnable, sensorEnable, sensorDisable, timerOff, timerOn,
+	serverSend;
+	isLockArmHorizontal, isLockArmVertical, isDoorClosed, serverReceive: Bool;
+	cardRead: Nat # Nat -> Bool;
+	ledOn, ledOff: lightColor;
+
+proc trialLeds(leds: lightArray) = sum c:lightColor .ledOn(c).trialLeds(leds[c->on]) + sum c:lightColor .ledOff(c).trialLeds(leds[c->off]);
+init trialLeds(lambda c:lightColor. off);	 
