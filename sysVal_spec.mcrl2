@@ -7,9 +7,23 @@ sort doorStatus = struct open | closed;
 
 act lockArm, unlockArm, pressEnable, sensorEnable, sensorDisable, timerOff, timerOn,
 	serverSend;
-	isLockArmHorizontal, isLockArmVertical, isDoorClosed, serverReceive: Bool;
+	serverReceive: Bool;
+	isDoorClosed: doorStatus;
+	isLockArmVertical: lockArmPosition;
 	cardRead: Nat # Nat -> Bool;
 	ledOn, ledOff: lightColor;
+	%User Actions:
+	openDoor,closeDoor,presentCard;
 
-proc trialLeds(leds: lightArray) = sum c:lightColor .ledOn(c).trialLeds(leds[c->on]) + sum c:lightColor .ledOff(c).trialLeds(leds[c->off]);
-init trialLeds(lambda c:lightColor. off);	 
+
+proc lightControl(leds: lightArray) = sum c:lightColor.(leds(c)!=on)->	 ledOn(c).lightControl(leds[c->on]) +
+ sum c:lightColor .(leds(c)!=off)->	ledOff(c).lightControl(leds[c->off]);
+	
+	doorControl(status:doorStatus) = isDoorClosed(status).doorControl() +
+	sum pos:lockArmPosition.isLockArmVertical(pos).(pos==vertical)->openDoor.doorControl(open);
+
+	lockArmControl(status:lockArmStatus, position:lockArmPosition) = isLockArmVertical(position).lockArmControl();
+
+	User = openDoor.User();
+
+init lightControl(lambda c:lightColor. off) || doorControl(closed) || lockArmControl(fixed, vertical) || User();
