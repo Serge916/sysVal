@@ -1,29 +1,33 @@
 sort doorStatus = struct open | closed;
-	lightStatus = struct on | off;
+	onOffStatus = struct on | off;
 	lightColor = struct green | red | yellow;
 	lockArmStatus = struct fixed | loose;
 	lockArmPosition = struct horizontal | vertical | inBetween;
-	lightArray =	lightColor -> lightStatus;	%Tracks the light status based on its color?
+	timerCallers = struct button | lockArm | isCardValid | led;
+	lightArray =	lightColor -> onOffStatus;
 
-act lockArm, unlockArm, pressEnable, sensorEnable, sensorDisable, timerOff, timerOn,
+act lockArm, unlockArm, pressEnable, sensorEnable, sensorDisable, forgetCard;
+	timerOff, timerOn: timerCallers;
 	serverSend;
 	serverReceive: Bool;
-	isDoorClosed: doorStatus;
-	isLockArmVertical: lockArmPosition;
-	cardRead: Nat # Nat -> Bool;
+	whereIsDoor: doorStatus;
+	whereIsLockArm: lockArmPosition;
+	cardRead;
 	ledOn, ledOff: lightColor;
-	%User Actions:
-	openDoor,closeDoor,presentCard;
 
+map position2bool: doorStatus -> Bool;
 
-proc lightControl(leds: lightArray) = sum c:lightColor.(leds(c)!=on)->	 ledOn(c).lightControl(leds[c->on]) +
- sum c:lightColor .(leds(c)!=off)->	ledOff(c).lightControl(leds[c->off]);
+eqn position2bool(closed) = true;
+	position2bool(open) = false;
 	
-	doorControl(status:doorStatus) = isDoorClosed(status).doorControl() +
-	sum pos:lockArmPosition.isLockArmVertical(pos).(pos==vertical)->openDoor.doorControl(open);
+proc lightControl(leds: lightArray) = sum c:lightColor .(leds(c)!=off)-> timerOff(led).ledOff(c).lightControl(leds[c->off]);
+	
+	doorAndlockControl(doorStat:doorStatus,lockPos:lockArmPosition,lockStat:lockArmStatus) = (lockPos==vertical && lockStat==fixed)->(whereIsDoor(open).doorAndlockControl(open,lockPos,lockStat) + 			whereIsDoor(closed).doorAndlockControl(closed, lockPos, lockStat)) + (lockStat==fixed)->unlockArm|timerOn(lockArm).doorAndlockControl(doorStat,lockPos,loose) + (lockStat==loose)->((lockPos!=vertical)-> (whereIsLockArm(vertical).forgetCard|lockArm.doorAndlockControl(doorStat,vertical,fixed)) + (lockPos==vertical)->whereIsDoor(closed).whereIsLockArm(horizontal).lockArm.doorAndlockControl(closed,horizontal,fixed) + whereIsLockArm(inBetween).ledOn(red)|ledOn(yellow).doorAndlockControl(doorStat,inBetween,loose));
 
-	lockArmControl(status:lockArmStatus, position:lockArmPosition) = isLockArmVertical(position).lockArmControl();
+	nfcController(cardNumber:Nat, readerStatus:onOffStatus) = (readerStatus==off)->pressEnable.sensorEnable|timerOn(button).nfcController(cardNumber,on) +	%Sensor wake up
+	(readerStatus==on && cardNumber==0)->(sum n:Nat.(n<3)->serverSend|timerOn(isCardValid).(serverReceive(true).ledOn(green)|timerOn(led)|sensorDisable.nfcController(n,off) + serverReceive(false).ledOn(red)|timerOn(led)|sensorDisable.nfcController(cardNumber,off) + timerOff(isCardValid).sensorDisable.nfcController(cardNumber,off)) + timerOff(button).sensorDisable.nfcController(cardNumber, off)) + (readerStatus==on && cardNumber!=0)->(sum n:Nat.(n==cardNumber)->cardRead.unlockArm|ledOn(green)|timerOn(led)|sensorDisable.nfcController(cardNumber,off) <> cardRead.ledOn(red)|timerOn(led)|sensorDisable.nfcController(cardNumber,off) + timerOff(button).nfcController(cardNumber, off))	%Reading cards
++ forgetCard.nfcController(0,readerStatus);
 
-	User = openDoor.User();
+	timer = sum caller:timerCallers.timerOn(caller).timerOff(caller);
 
-init lightControl(lambda c:lightColor. off) || doorControl(closed) || lockArmControl(fixed, vertical) || User();
+init lightControl(lambda c:lightColor. off) || doorAndlockControl(closed,vertical,fixed) || nfcController(0,off) || timer;

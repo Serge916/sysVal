@@ -5,5 +5,6 @@
   <property>noLighOfftCommanRepetition</property>
   <property>noDeadlocks</property>
   <property>openDoorLockArmHorizontal</property>
+  <property>lockArmPrecededByDoorOpen</property>
  </properties>
 </root>

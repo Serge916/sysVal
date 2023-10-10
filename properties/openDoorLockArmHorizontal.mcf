@@ -1,1 +1,1 @@
-[true*.isDoorClosed(closed).isLockArmVertical(horizontal).!unlockArm*.openDoor.isDoorClosed(open)]false
+[true*.whereIsDoor(closed).whereIsLockArm(horizontal).!unlockArm*.whereIsDoor(open).whereIsDoor(open)]false
