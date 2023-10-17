@@ -1,0 +1,2 @@
+[timerOff(isCardValid)]mu X(b1:Bool=false,b2:Bool=false).(
+[ledOn(yellow)]X(true,b2) && [ledOff(yellow)]X(false,b2) && [ledOn(red)]X(b1,true) && [ledOff(red)]X(b1,false) && val(b1 && b2)=>[timerOn(led)]true && [!ledOn(red) && !ledOn(yellow) && !ledOn(yellow) && !ledOff(yellow)]X(b1,b2))

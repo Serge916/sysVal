@@ -1,0 +1,3 @@
+[true*.serverOpenCommand.unlockArm]nu X.(
+[!whereIsLockArm(vertical)]X &&
+<true.lockArm>true)

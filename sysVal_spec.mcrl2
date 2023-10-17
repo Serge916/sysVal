@@ -6,28 +6,49 @@ sort doorStatus = struct open | closed;
 	timerCallers = struct button | lockArm | isCardValid | led;
 	lightArray =	lightColor -> onOffStatus;
 
-act lockArm, unlockArm, pressEnable, sensorEnable, sensorDisable, forgetCard;
-	timerOff, timerOn: timerCallers;
-	serverSend;
+act pressEnable, sensorEnable, sensorDisable;
+	lockArm, unlockArm, sendLockArm, getLockArm, sendUnlockArm, getUnlockArm;
+	sendForgetCard, getForgetCard, forgetCard;
+	sendTimerOn, sendTimerOff, getTimerOn, getTimerOff, timerOff, timerOn: timerCallers;
+	serverSend: Nat;
+	serverOpenCommand;
 	serverReceive: Bool;
 	whereIsDoor: doorStatus;
 	whereIsLockArm: lockArmPosition;
-	cardRead;
-	ledOn, ledOff: lightColor;
+	lockArmStatusRequest, lockArmStatusAnswer, howIsLockArm: lockArmStatus;
+	cardRead: Nat;
+	sendLedOn, getLedOn, ledOn, getLedOff, sendLedOff, ledOff: lightColor;
 
 map position2bool: doorStatus -> Bool;
+	lockStat2bool: lockArmStatus -> Bool;
+	cardCompare: Nat # Nat -> Bool;
+	maxUser: Nat;
 
-eqn position2bool(closed) = true;
+var n,m: Nat;
+
+eqn maxUser = 3;
+	position2bool(closed) = true;
 	position2bool(open) = false;
+	lockStat2bool(fixed) = true;
+	lockStat2bool(loose) = false;
+	cardCompare(n,m) = false;
+	cardCompare(n,n) = true;
+	cardCompare(m,n) = cardCompare(n,m);
 	
-proc lightControl(leds: lightArray) = sum c:lightColor .(leds(c)!=off)-> timerOff(led).ledOff(c).lightControl(leds[c->off]);
+proc lightControl(leds: lightArray) = sum c:lightColor.(leds(c)!=off)->(getTimerOff(led)+getLedOff(c)).lightControl(leds[c->off]) + sum c:lightColor.(leds(c)!=on)->getLedOn(c).lightControl(leds[c->on]);
 	
-	doorAndlockControl(doorStat:doorStatus,lockPos:lockArmPosition,lockStat:lockArmStatus) = (lockPos==vertical && lockStat==fixed)->(whereIsDoor(open).doorAndlockControl(open,lockPos,lockStat) + 			whereIsDoor(closed).doorAndlockControl(closed, lockPos, lockStat)) + (lockStat==fixed)->unlockArm|timerOn(lockArm).doorAndlockControl(doorStat,lockPos,loose) + (lockStat==loose)->((lockPos!=vertical)-> (whereIsLockArm(vertical).forgetCard|lockArm.doorAndlockControl(doorStat,vertical,fixed)) + (lockPos==vertical)->whereIsDoor(closed).whereIsLockArm(horizontal).lockArm.doorAndlockControl(closed,horizontal,fixed) + whereIsLockArm(inBetween).ledOn(red)|ledOn(yellow).doorAndlockControl(doorStat,inBetween,loose));
+	doorAndlockControl(doorStat:doorStatus,lockPos:lockArmPosition,lockStat:lockArmStatus) = lockArmStatusAnswer(lockStat).doorAndlockControl() +
+(lockPos!=horizontal)->(whereIsDoor(open).doorAndlockControl(open,lockPos,lockStat) + whereIsDoor(closed).doorAndlockControl(closed, lockPos, lockStat)) + 
+(lockStat==fixed)->(getUnlockArm.sendTimerOn(lockArm).doorAndlockControl(doorStat,lockPos,loose))+
+(lockStat==fixed && lockPos==horizontal)->(serverOpenCommand.sendForgetCard.unlockArm.sendLedOn(yellow).doorAndlockControl(closed,horizontal,loose)) +
+(lockStat==loose)->((lockPos!=vertical)-> whereIsLockArm(vertical).sendForgetCard.lockArm.sendLedOff(red).sendLedOff(yellow).doorAndlockControl(doorStat,vertical,fixed) + (lockPos==horizontal)->getTimerOff(lockArm).whereIsLockArm(horizontal).doorAndlockControl(closed,horizontal,fixed) + (lockPos==vertical)->whereIsDoor(closed).whereIsLockArm(horizontal).lockArm.doorAndlockControl(closed,horizontal,fixed) + getTimerOff(lockArm).whereIsLockArm(inBetween).sendLedOn(red).sendLedOn(yellow).doorAndlockControl(doorStat,inBetween,loose));
 
-	nfcController(cardNumber:Nat, readerStatus:onOffStatus) = (readerStatus==off)->pressEnable.sensorEnable|timerOn(button).nfcController(cardNumber,on) +	%Sensor wake up
-	(readerStatus==on && cardNumber==0)->(sum n:Nat.(n<3)->serverSend|timerOn(isCardValid).(serverReceive(true).ledOn(green)|timerOn(led)|sensorDisable.nfcController(n,off) + serverReceive(false).ledOn(red)|timerOn(led)|sensorDisable.nfcController(cardNumber,off) + timerOff(isCardValid).sensorDisable.nfcController(cardNumber,off)) + timerOff(button).sensorDisable.nfcController(cardNumber, off)) + (readerStatus==on && cardNumber!=0)->(sum n:Nat.(n==cardNumber)->cardRead.unlockArm|ledOn(green)|timerOn(led)|sensorDisable.nfcController(cardNumber,off) <> cardRead.ledOn(red)|timerOn(led)|sensorDisable.nfcController(cardNumber,off) + timerOff(button).nfcController(cardNumber, off))	%Reading cards
-+ forgetCard.nfcController(0,readerStatus);
+	nfcController(cardNumber:Nat, readerStatus:onOffStatus) = ((readerStatus==off)->sum lockStatus:lockArmStatus.lockArmStatusRequest(lockStatus).(lockStatus==fixed)->pressEnable.sensorEnable.sendTimerOn(button).nfcController(cardNumber,on)) +	%Sensor wake up
+	(((readerStatus==on && cardNumber==0)->(sum n:Nat.(n<maxUser)->cardRead(n).serverSend(n).sendTimerOn(isCardValid).(serverReceive(true).sendLedOn(green).sendTimerOn(led).sensorDisable.nfcController(n,off) + serverReceive(false).sendLedOn(red).sendTimerOn(led).sensorDisable.nfcController(0,off) + getTimerOff(isCardValid).sensorDisable.sendLedOn(red).sendLedOn(yellow).sendTimerOn(led).nfcController(cardNumber,off)) + getTimerOff(button).sensorDisable.nfcController(cardNumber, off))) + ((readerStatus==on && cardNumber!=0)->(sum n:Nat.(n==cardNumber)->cardRead(n).unlockArm.sendLedOn(green).sendTimerOn(led).sensorDisable.nfcController(cardNumber,off) <> cardRead(n).sendLedOn(red).sendTimerOn(led).sensorDisable.nfcController(cardNumber,off) + getTimerOff(button).sensorDisable.nfcController(cardNumber, off))))	%Reading cards
++ getForgetCard.sensorDisable.nfcController(0,off);
 
-	timer = sum caller:timerCallers.timerOn(caller).timerOff(caller);
+	timer = sum caller:timerCallers.getTimerOn(caller).sendTimerOff(caller);
 
-init lightControl(lambda c:lightColor. off) || doorAndlockControl(closed,vertical,fixed) || nfcController(0,off) || timer;
+init allow({timerOn,timerOff,forgetCard,lockArm,unlockArm,ledOn,ledOff,pressEnable, sensorEnable, sensorDisable,serverSend,serverOpenCommand,serverReceive,whereIsDoor,whereIsLockArm,howIsLockArm,cardRead},
+	 comm({sendTimerOn|getTimerOn -> timerOn, sendForgetCard|getForgetCard -> forgetCard, sendLockArm|getLockArm -> lockArm, sendUnlockArm|getUnlockArm -> unlockArm, sendLedOn|getLedOn -> ledOn, sendLedOff|getLedOff -> ledOff, lockArmStatusRequest|lockArmStatusAnswer -> howIsLockArm},
+	 lightControl(lambda c:lightColor. off) || doorAndlockControl(closed,vertical,fixed) || nfcController(0,off) || timer));

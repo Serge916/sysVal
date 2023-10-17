@@ -4,7 +4,15 @@
   <property>noLighOntCommanRepetition</property>
   <property>noLighOfftCommanRepetition</property>
   <property>noDeadlocks</property>
-  <property>openDoorLockArmHorizontal</property>
   <property>lockArmPrecededByDoorOpen</property>
+  <property>cardReading</property>
+  <property>timerOffAndinBetween</property>
+  <property>normalClose</property>
+  <property>serverOpen</property>
+  <property>timerOffLockArm</property>
+  <property>cardReadingModified</property>
+  <property>lightShouldBeTemporal</property>
+  <property>lockArmWillFix</property>
+  <property>turnOnLedsAfterServerNotConnect</property>
  </properties>
 </root>

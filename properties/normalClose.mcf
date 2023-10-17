@@ -1,0 +1,4 @@
+[true*.unlockArm]nu X.(
+[whereIsLockArm(horizontal)]mu Y.([!whereIsLockArm(vertical)]Y && <true><lockArm>true) &&
+[whereIsLockArm(vertical)]mu Y.([!whereIsLockArm(horizontal)]<lockArm>Y && <true><lockArm>true) &&
+[!whereIsLockArm(horizontal) && !whereIsLockArm(vertical)]X)

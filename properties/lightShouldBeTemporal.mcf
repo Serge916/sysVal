@@ -1,0 +1,4 @@
+nu X.(forall c:lightColor.[ledOn(c)]mu Y.(
+[!ledOff(c)]Y && <true>true &&
+[!exists c:lightColor.ledOn(c) && !exists c:lightColor.ledOff(c)]X)
+)
