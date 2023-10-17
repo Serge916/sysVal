@@ -35,7 +35,7 @@ eqn maxUser = 3;
 	cardCompare(n,n) = true;
 	cardCompare(m,n) = cardCompare(n,m);
 	
-proc lightControl(leds: lightArray) = sum c:lightColor.(leds(c)!=off)->(getTimerOff(led)+getLedOff(c)).lightControl(leds[c->off]) + sum c:lightColor.(leds(c)!=on)->getLedOn(c).lightControl(leds[c->on]);
+proc lightControl(leds: lightArray) = sum c:lightColor.(leds(c)!=off)->(getTimerOff(led)+getLedOff(c)).lightControl(leds[c->off]) + sum c:lightColor.(leds(c)!=on)->(leds(c)!=on)->getLedOn(c).lightControl(leds[c->on]);
 	
 	doorAndlockControl(doorStat:doorStatus,lockPos:lockArmPosition,lockStat:lockArmStatus) = lockArmStatusAnswer(lockStat).doorAndlockControl() +
 (lockPos!=horizontal)->(whereIsDoor(open).doorAndlockControl(open,lockPos,lockStat) + whereIsDoor(closed).doorAndlockControl(closed, lockPos, lockStat)) + 
