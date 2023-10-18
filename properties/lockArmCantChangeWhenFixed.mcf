@@ -1,0 +1,1 @@
+[true*.howIsLockArm(fixed).whereIsLockArm(horizontal)][!unlockArm*.whereIsLockArm(vertical)]false

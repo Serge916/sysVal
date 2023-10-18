@@ -1,0 +1,1 @@
+[true*.whereIsLockArm(inBetween).!(whereIsLockArm(vertical)||whereIsLockArm(horizontal))*.lockArm]false

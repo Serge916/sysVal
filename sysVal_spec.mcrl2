@@ -36,8 +36,8 @@ proc lightControl(leds: lightArray) = sum c:lightColor.(getTimerOff(led).lightCo
 		((lockPos==horizontal)->(whereIsLockArm(vertical).lockArm.sendForgetCard.sendLedOff(yellow).sendLedOff(red).doorAndLockControl(doorStat,vertical,fixed))) + 
 		((lockPos==vertical)->(((doorStat==closed)->(whereIsLockArm(horizontal).lockArm.doorAndLockControl(closed,horizontal,fixed))))) + 
 		getTimerOff(lockArm).whereIsLockArm(inBetween).sendLedOn(yellow).sendLedOn(red).doorAndLockControl(doorStat,lockPos,lockStat) + 
-		getTimerOff(lockArm).lockArm.doorAndLockControl(doorStat,lockPos,fixed))) + 
-	((lockPos==vertical)->(sum p:doorStatus.whereIsDoor(p).doorAndLockControl(p,vertical,fixed)));
+		sum p:lockArmPosition.(p==lockPos)->getTimerOff(lockArm).whereIsLockArm(p).lockArm.doorAndLockControl(doorStat,lockPos,fixed))) + 
+	((lockPos==vertical)->(sum p:doorStatus.whereIsDoor(p).doorAndLockControl(p,vertical,lockStat)));
 
 
 	nfcController(ownerNumber:Nat,readerStatus:onOffStatus) = getForgetCard.nfcController(0,readerStatus) + 
@@ -47,9 +47,9 @@ proc lightControl(leds: lightArray) = sum c:lightColor.(getTimerOff(led).lightCo
 	((readerStatus==on)->(
 		sum n:Nat.(n<maxUser && n!=0)->(cardRead(n).sensorDisable.(ownerNumber==0)->(
 			serverSend(n).sendTimerOn(server).(serverReceive(true).sendUnlockArm.nfcController(n,off) + 
-			serverReceive(false).ledOn(red).timerOn(led).nfcController(ownerNumber,off) + 
-			getTimerOff(server).ledOn(yellow).ledOn(red).nfcController(ownerNumber,off))) <>
-			((n==ownerNumber)->sendUnlockArm.sendTimerOn(lockArm).ledOn(green).sendTimerOn(led).nfcController(ownerNumber,off) + 
+			serverReceive(false).sendLedOn(red).timerOn(led).nfcController(ownerNumber,off) + 
+			getTimerOff(server).sendLedOn(yellow).sendLedOn(red).nfcController(ownerNumber,off))) <>
+			((n==ownerNumber)->sendUnlockArm.sendTimerOn(lockArm).sendLedOn(green).sendTimerOn(led).nfcController(ownerNumber,off) + 
 			((n!=ownerNumber)->sendLedOn(red).sendTimerOn(led).nfcController(ownerNumber,off))) + 
 		(getTimerOff(button).sensorDisable.nfcController(ownerNumber,off)))));
 

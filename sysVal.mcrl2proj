@@ -1,16 +1,17 @@
 <root>
  <spec>sysVal_spec.mcrl2</spec>
  <properties>
-  <property>noDeadlocks</property>
-  <property>timerOffAndinBetween</property>
+  <property>First_noDeadlocks</property>
+  <property>inBetweenAfterLocking</property>
   <property>cardReading</property>
   <property>lightShouldBeTemporal</property>
-  <property>lockArmWillFix</property>
   <property>turnOnLedsAfterServerNotConnect</property>
-  <property>cardAgain</property>
   <property>sensorEnable</property>
   <property>cardPrueba</property>
-  <property>PruebasSimples</property>
+  <property>lockArmCantChangeWhenFixed</property>
   <property>PruebasComplejas</property>
+  <property>Second_willNotOpenWithoutCommand</property>
+  <property>lockArmWillFixRework</property>
+  <property>timeoutInBetweenWillLock</property>
  </properties>
 </root>

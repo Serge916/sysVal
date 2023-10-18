@@ -1,4 +1,1 @@
-nu X.(forall c:lightColor.[ledOn(c)]mu Y.(
-[!ledOff(c)]Y && <true>true &&
-[!exists c:lightColor.ledOn(c) && !exists c:lightColor.ledOff(c)]X)
-)
+forall c:lightColor.[true*.ledOn(c)]([timerOn(led)]<true*.timerOff(led)>true || [!timerOn(led)]<true*.ledOff(c)>true)
