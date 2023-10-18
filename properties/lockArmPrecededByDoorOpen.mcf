@@ -1,4 +1,0 @@
-nu X(position:doorStatus=closed).(
-	forall pos:doorStatus.[whereIsDoor(pos)]X(pos) &&
-	[!(exists pos:doorStatus.whereIsDoor(pos))]X(closed)&&
-	[lockArm]val(position2bool(position)))

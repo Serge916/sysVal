@@ -1,7 +1,8 @@
 nu X(ownerNumber:Nat=0,isLockerClosed:Bool=false).(
 [whereIsLockArm(horizontal)]X(ownerNumber,true) &&
 [unlockArm]X(0,false) &&
-forall n:Nat.val(n<maxUser)=>[cardRead(n)]X(if(isLockerClosed,ownerNumber,n),isLockerClosed) &&
+forall n:Nat.val(n<maxUser)=>([cardRead(n)]val(ownerNumber==0))=>mu Y.([serverReceive(true)]X(n,isLockerClosed) && [serverReceive(false)]X(0,isLockerClosed) 
+&& [timerOff(server)]X(0,isLockerClosed) && [!exists b:Bool.serverReceive(b) && !timerOff(server)]Y) &&
 forall n:Nat.val(n<maxUser)=>([cardRead(n)](val(n==ownerNumber))=>(mu Y.([!unlockArm]true && <true>true))) &&
 [!(whereIsLockArm(horizontal) || exists n:Nat.cardRead(n) || unlockArm)]X(ownerNumber, isLockerClosed)
 )

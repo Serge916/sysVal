@@ -1,0 +1,5 @@
+nu X(card:Nat=0,isClosed:Bool=false).(
+[whereIsLockArm(horizontal)]X(card,true) &&
+[unlockArm]X(0,false) &&
+(forall n:Nat.val(card==0 && n<maxUser)=>[cardRead(n)]mu Y.( [serverReceive(true)]X(n,isClosed) && [serverReceive(false) || timerOff(server)]X(0,false) && [!exists b:Bool.serverReceive(b) && timerOff(server)]Y)) && (forall n:Nat.val(n<maxUser)=>[cardRead(n)]val(n==card)=>mu Y.([!unlockArm]Y && <true>true)) && 
+[!whereIsLockArm(horizontal) && !unlockArm]X(card,isClosed))

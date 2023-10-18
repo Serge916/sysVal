@@ -1,4 +1,0 @@
-[!serverOpenCommand*.unlockArm.timerOff(lockArm)]nu X.(
-[whereIsLockArm(horizontal)]mu Y.([!lockArm]Y && <true>true) &&
-[whereIsLockArm(vertical)]mu Y.([!lockArm]Y && <true>true) &&
-[!whereIsLockArm(horizontal) && !whereIsLockArm(vertical)]X)

@@ -1,0 +1,5 @@
+nu X(pos:lockArmPosition=vertical,state:lockArmStatus=fixed).(
+[unlockArm]X(pos,loose))&&
+(val(state==loose && pos==horizontal)=> [whereIsLockArm(vertical).!lockArm*]<lockArm>X(horizontal,fixed)) &&
+(val(state==loose && pos==vertical)=> [whereIsLockArm(horizontal).!lockArm*]<lockArm>X(vertical,fixed))  &&
+[!unlockArm && !whereIsLockArm(vertical) && !whereIsLockArm(horizontal)]X(pos,state)

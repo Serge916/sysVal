@@ -1,18 +1,16 @@
 <root>
  <spec>sysVal_spec.mcrl2</spec>
  <properties>
-  <property>noLighOntCommanRepetition</property>
-  <property>noLighOfftCommanRepetition</property>
   <property>noDeadlocks</property>
-  <property>lockArmPrecededByDoorOpen</property>
-  <property>cardReading</property>
   <property>timerOffAndinBetween</property>
-  <property>normalClose</property>
-  <property>serverOpen</property>
-  <property>timerOffLockArm</property>
-  <property>cardReadingModified</property>
+  <property>cardReading</property>
   <property>lightShouldBeTemporal</property>
   <property>lockArmWillFix</property>
   <property>turnOnLedsAfterServerNotConnect</property>
+  <property>cardAgain</property>
+  <property>sensorEnable</property>
+  <property>cardPrueba</property>
+  <property>PruebasSimples</property>
+  <property>PruebasComplejas</property>
  </properties>
 </root>

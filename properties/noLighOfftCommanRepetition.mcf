@@ -1,1 +1,0 @@
-forall c:lightColor.[true*.ledOff(c).!ledOn(c)*.ledOff(c)]false
