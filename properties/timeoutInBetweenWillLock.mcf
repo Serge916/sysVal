@@ -1,1 +1,1 @@
-[!serverOpenCommand*.unlockArm.timerOff(lockArm).whereIsLockArm(inBetween)]<!(whereIsLockArm(vertical)||whereIsLockArm(horizontal))*.lockArm>true
+[!serverOpenCommand*.unlockArm.timerOff(lockArm).whereIsLockArm(inBetween).!lockArm]<true*.lockArm>true

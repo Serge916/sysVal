@@ -46,7 +46,7 @@ proc lightControl(leds: lightArray) = sum c:lightColor.(getTimerOff(led).lightCo
 		(pressEnable.sensorEnable.sendTimerOn(button).nfcController(ownerNumber,on)))) + 
 	((readerStatus==on)->(
 		sum n:Nat.(n<maxUser && n!=0)->(cardRead(n).sensorDisable.(ownerNumber==0)->(
-			serverSend(n).sendTimerOn(server).(serverReceive(true).sendUnlockArm.nfcController(n,off) + 
+			serverSend(n).sendTimerOn(server).(serverReceive(true).sendUnlockArm.sendLedOn(green).sendTimerOn(led).nfcController(n,off) + 
 			serverReceive(false).sendLedOn(red).timerOn(led).nfcController(ownerNumber,off) + 
 			getTimerOff(server).sendLedOn(yellow).sendLedOn(red).nfcController(ownerNumber,off))) <>
 			((n==ownerNumber)->sendUnlockArm.sendTimerOn(lockArm).sendLedOn(green).sendTimerOn(led).nfcController(ownerNumber,off) + 

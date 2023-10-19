@@ -1,0 +1,1 @@
+forall n:Nat,b:Bool.val(n<maxUser)=>[true*.cardRead(n)](<true*.serverReceive(b)>true && <true*.timerOff(server)>true)

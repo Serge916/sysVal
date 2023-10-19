@@ -1,0 +1,2 @@
+forall n:Nat.val(n<maxUser)=>
+[true*.cardRead(n).true*.serverReceive(true)]<true*.cardRead(n).true*.unlockArm>true

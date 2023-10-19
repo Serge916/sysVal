@@ -1,0 +1,1 @@
+[!(timerOff(server)||whereIsLockArm(inBetween))*.ledOn(yellow).ledOn(red)]false

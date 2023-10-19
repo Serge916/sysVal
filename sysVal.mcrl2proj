@@ -2,16 +2,20 @@
  <spec>sysVal_spec.mcrl2</spec>
  <properties>
   <property>First_noDeadlocks</property>
-  <property>inBetweenAfterLocking</property>
-  <property>cardReading</property>
+  <property>inBetweenAftermath</property>
   <property>lightShouldBeTemporal</property>
   <property>turnOnLedsAfterServerNotConnect</property>
   <property>sensorEnable</property>
-  <property>cardPrueba</property>
   <property>lockArmCantChangeWhenFixed</property>
-  <property>PruebasComplejas</property>
   <property>Second_willNotOpenWithoutCommand</property>
   <property>lockArmWillFixRework</property>
   <property>timeoutInBetweenWillLock</property>
+  <property>differentCardCannotOpen</property>
+  <property>sameCardUnlocks</property>
+  <property>horizontalLockJustClosed</property>
+  <property>greenLedOn</property>
+  <property>newCard</property>
+  <property>ledNotConnect</property>
+  <property>ledsOnWhenServerNotConnect</property>
  </properties>
 </root>
